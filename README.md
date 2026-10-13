@@ -2,6 +2,8 @@
 
 Jiu-jitsu belt promotions recorded on a public blockchain, plus a printable certificate whose QR fingerprint can be checked against the chain.
 
+**Live prototype:** https://sphericalwave.github.io/beltchain/
+
 ## How it works
 
 1. **Academy registers** (`registerAcademy`) and the registry admin marks it verified (`setVerified`). Unverified academies can't issue belts.
@@ -16,7 +18,7 @@ Belts: White, Blue, Purple, Brown, Black, Red & Black, Red & White, Red. Stripes
 - `contracts/BeltRegistry.sol` — the registry
 - `test/BeltRegistry.test.js` — Hardhat tests
 - `scripts/deploy.js` — deploy script
-- `certificate/index.html` — certificate prototype (live editor, computes the same fingerprint as the contract)
+- `docs/index.html` — certificate prototype, served by GitHub Pages (live editor, computes the same fingerprint as the contract)
 
 ## Commands
 

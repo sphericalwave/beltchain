@@ -1,3 +1,9 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Prototype jiu-jitsu belt certificate backed by an on-chain promotion registry.">
 <title>Beltchain Certificate</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -35,6 +41,10 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+img { max-width: 100%; }
+body { margin: 0; }
 body { background: var(--page); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5; }
 .wrap { max-width: 1240px; margin: 0 auto; padding-inline: 16px; padding-block: 24px 48px; display: grid; gap: 24px; }
 
@@ -123,6 +133,8 @@ button.copy:hover { border-color: var(--accent); }
 .step h4 { margin: 0; font-size: 1rem; font-weight: 600; text-wrap: balance; }
 .step p { margin: 0; color: var(--muted); max-width: 48ch; }
 code { font-family: var(--font-mono); font-size: 0.88em; }
+footer.site { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--line); padding-top: 16px; }
+footer.site a { color: var(--accent); }
 
 /* ---------- Tabs ---------- */
 nav.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); }
@@ -298,6 +310,8 @@ nav.tabs .count { font-family: var(--font-mono); font-size: 0.75rem; margin-left
       </article>
     </div>
   </div>
+
+  <footer class="site">Source, contract and tests: <a href="https://github.com/sphericalwave/beltchain">github.com/sphericalwave/beltchain</a></footer>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
