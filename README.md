@@ -2,7 +2,7 @@
 
 Jiu-jitsu belt promotions recorded on a public blockchain, plus a printable certificate whose QR fingerprint can be checked against the chain.
 
-**Live prototype:** https://sphericalwave.github.io/beltchain/
+**Live prototype:** https://sphericalwave.com/beltchain/
 
 ## How it works
 
