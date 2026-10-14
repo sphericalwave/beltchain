@@ -49,7 +49,8 @@ PRIVATE_KEY=0x... npm run deploy:sepolia   # Base Sepolia testnet, needs faucet 
 
 ## Nova Scotia resources
 
-There is no official Nova Scotia jiu-jitsu black-belt registry that we could find. These informal lists are the closest:
+Nova Scotia has no official black-belt registry; the community keeps its own lists.
 
+- [Nova Scotia BJJ black belt list](https://www.facebook.com/groups/1777853499249810/posts/2949045728797242/) — community-maintained list of Nova Scotia black belts, posted in a Facebook group (Facebook login may be required). The best existing starting point for seeding Beltchain's first black belts.
 - [All of the BJJ Clubs in Nova Scotia](https://joshpresley.substack.com/p/all-of-the-bjj-clubs-in-nova-scotia) — Josh Presley's directory (Feb 2025): 37 clubs with instructors and ranks, about 19 black belts. Ranks are as reported by the clubs; no lineage.
 - [Coastline BJJ Collective: Nova Scotia clubs](https://www.coastline-bjj-collective.com/clubs-atlantic-canada/nova-scotia) — map and list of Nova Scotia academies; no ranks.
