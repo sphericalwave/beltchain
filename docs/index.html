@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Prototype jiu-jitsu belt certificate backed by an on-chain promotion registry.">
+<title>Beltchain Certificate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: the certificate is the hero (paper object, same in both themes); editor + on-chain record sit beside it, stacking on phones. */
+:root {
+  --page: #E9ECF2;
+  --panel: #FFFFFF;
+  --ink: #16223F;
+  --muted: #5B6683;
+  --line: #D3D9E5;
+  --accent: #1A3FA8;
+  --ok: #1D7A4E;
+  --warn: #9A5B00;
+  --warn-bg: #FFF2DC;
+  /* Paper is a physical object: fixed values, not themed */
+  --paper: #F7F8FB;
+  --paper-ink: #13204A;
+  --paper-rule: #B9C2D6;
+  --guilloche: rgba(26, 63, 168, 0.07);
+  --font-display: "Marcellus", "Trajan Pro", Georgia, serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --page: #0E1322; --panel: #161D31; --ink: #E5E9F3; --muted: #95A0BC; --line: #2A3450;
+    --accent: #7FA0FF; --ok: #5FD39A; --warn: #F2B65A; --warn-bg: #3A2A10; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --page: #0E1322; --panel: #161D31; --ink: #E5E9F3; --muted: #95A0BC; --line: #2A3450;
+  --accent: #7FA0FF; --ok: #5FD39A; --warn: #F2B65A; --warn-bg: #3A2A10; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+img { max-width: 100%; }
+body { margin: 0; }
+body { background: var(--page); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-inline: 16px; padding-block: 24px 48px; display: grid; gap: 24px; }
+
+header.top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; }
+header.top h1 { font-family: var(--font-display); font-weight: 400; font-size: 1.6rem; margin: 0; letter-spacing: 0.02em; text-wrap: balance; }
+header.top p { margin: 0; color: var(--muted); max-width: 60ch; }
+.chip { display: inline-flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; background: var(--warn-bg); color: var(--warn); white-space: nowrap; }
+.chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+
+.main { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 24px; align-items: start; }
+@media (max-width: 960px) { .main { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------- Certificate ---------- */
+.cert-shell { container-type: inline-size; min-width: 0; }
+.cert {
+  position: relative; aspect-ratio: 1.414; max-width: 100%;
+  background: var(--paper); color: var(--paper-ink);
+  box-shadow: 0 1px 2px rgba(10, 20, 50, .12), 0 12px 40px rgba(10, 20, 50, .18);
+  overflow: hidden;
+}
+.cert canvas.guilloche { position: absolute; inset: 0; width: 100%; height: 100%; }
+.cert .frame { position: absolute; inset: 2.6cqw; border: 0.25cqw solid var(--paper-ink); }
+.cert .frame::after { content: ""; position: absolute; inset: 0.7cqw; border: 0.1cqw solid var(--paper-rule); }
+.cert .body {
+  position: absolute; inset: 5cqw 7cqw 4.6cqw; display: grid;
+  grid-template-rows: auto auto 1fr auto; justify-items: center; text-align: center;
+}
+.cert .org { font-family: var(--font-body); font-size: 1.15cqw; font-weight: 600; letter-spacing: 0.4em; text-transform: uppercase; color: var(--paper-ink); opacity: .75; }
+.cert h2 { font-family: var(--font-display); font-weight: 400; font-size: 4.6cqw; letter-spacing: 0.08em; margin: 0.8cqw 0 0; line-height: 1.1; }
+.cert .center { display: grid; align-content: center; justify-items: center; gap: 1.1cqw; width: 100%; }
+.cert .small { font-size: 1.45cqw; font-style: italic; font-family: Georgia, serif; color: var(--paper-ink); opacity: .8; }
+.cert .student { font-family: var(--font-display); font-size: 5.4cqw; line-height: 1.05; border-bottom: 0.12cqw solid var(--paper-rule); padding: 0 4cqw 0.6cqw; max-width: 100%; overflow-wrap: anywhere; }
+.cert .rank { font-family: var(--font-display); font-size: 3cqw; letter-spacing: 0.12em; text-transform: uppercase; }
+.belt { position: relative; width: 52cqw; height: 3.2cqw; border-radius: 0.3cqw; box-shadow: inset 0 -0.35cqw 0 rgba(0,0,0,.18), inset 0 0.25cqw 0 rgba(255,255,255,.25); }
+.belt .bar { position: absolute; top: 0; bottom: 0; right: 4cqw; width: 13cqw; display: flex; justify-content: center; gap: 1.1cqw; align-items: stretch; padding-inline: 1.4cqw; }
+.belt .stripe { width: 0.9cqw; background: #F4F4F4; box-shadow: inset 0 -0.2cqw 0 rgba(0,0,0,.15); }
+.cert .where { font-size: 1.5cqw; }
+.cert .where b { font-weight: 600; }
+
+.cert .foot { width: 100%; display: grid; grid-template-columns: 1fr auto 1fr; align-items: end; gap: 3cqw; }
+.sig { display: grid; justify-items: center; gap: 0.4cqw; }
+.sig .name { font-family: "Snell Roundhand", "Brush Script MT", cursive; font-size: 2.6cqw; line-height: 1; min-height: 2.6cqw; }
+.sig .rule { width: 100%; border-top: 0.12cqw solid var(--paper-ink); }
+.sig .label { font-size: 1cqw; letter-spacing: 0.25em; text-transform: uppercase; opacity: .7; }
+.seal { display: grid; justify-items: center; gap: 0.5cqw; }
+.seal .qr { width: 10cqw; height: 10cqw; background: #fff; padding: 0.5cqw; border: 0.12cqw solid var(--paper-rule); }
+.seal .qr svg { width: 100%; height: 100%; display: block; }
+.seal .fp { font-family: var(--font-mono); font-size: 0.95cqw; letter-spacing: 0.05em; }
+.seal .rec { font-size: 0.95cqw; letter-spacing: 0.2em; text-transform: uppercase; opacity: .7; }
+
+.specimen {
+  position: absolute; top: 7cqw; right: -6cqw; transform: rotate(32deg);
+  font-family: var(--font-body); font-weight: 600; font-size: 1.4cqw; letter-spacing: 0.4em;
+  background: #B4232A; color: #fff; padding: 0.6cqw 8cqw; opacity: .9;
+}
+
+/* ---------- Side panels ---------- */
+.side { display: grid; gap: 16px; min-width: 0; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 18px; display: grid; gap: 14px; min-width: 0; }
+.panel h3 { margin: 0; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.field { display: grid; gap: 4px; }
+.field label { font-size: 0.85rem; font-weight: 500; }
+.field input, .field select {
+  font: inherit; color: var(--ink); background: var(--page); border: 1px solid var(--line); border-radius: 7px;
+  padding: 9px 11px; min-height: 42px; width: 100%;
+}
+.field input:focus-visible, .field select:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+dl.record { margin: 0; display: grid; gap: 10px; }
+dl.record div { display: grid; gap: 2px; min-width: 0; }
+dl.record dt { font-size: 0.78rem; color: var(--muted); }
+dl.record dd { margin: 0; font-family: var(--font-mono); font-size: 0.82rem; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.status { display: flex; gap: 8px; align-items: center; }
+button.copy {
+  font: inherit; font-size: 0.85rem; font-weight: 500; color: var(--accent); background: transparent;
+  border: 1px solid var(--line); border-radius: 7px; padding: 8px 12px; min-height: 40px; cursor: pointer; justify-self: start;
+}
+button.copy:hover { border-color: var(--accent); }
+
+/* ---------- How it works ---------- */
+.how { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 760px) { .how { grid-template-columns: minmax(0, 1fr); } }
+.step { display: grid; gap: 6px; align-content: start; padding-top: 14px; border-top: 2px solid var(--ink); }
+.step .n { font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted); }
+.step h4 { margin: 0; font-size: 1rem; font-weight: 600; text-wrap: balance; }
+.step p { margin: 0; color: var(--muted); max-width: 48ch; }
+code { font-family: var(--font-mono); font-size: 0.88em; }
+footer.site { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--line); padding-top: 16px; }
+footer.site a { color: var(--accent); }
+
+/* ---------- Tabs ---------- */
+nav.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); }
+nav.tabs a {
+  color: var(--muted); text-decoration: none; font-weight: 500; padding: 10px 14px; min-height: 44px;
+  display: inline-flex; align-items: center; border-bottom: 2px solid transparent; margin-bottom: -1px;
+}
+nav.tabs a:hover { color: var(--ink); }
+nav.tabs a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--accent); }
+nav.tabs a:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+nav.tabs .count { font-family: var(--font-mono); font-size: 0.75rem; margin-left: 6px; color: var(--muted); }
+.page { display: grid; gap: 24px; }
+
+/* ---------- Open questions ---------- */
+.questions { display: grid; gap: 20px; max-width: 860px; }
+.questions .intro { margin: 0; color: var(--muted); max-width: 65ch; }
+.q { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 20px; display: grid; gap: 12px; min-width: 0; }
+.q .tag { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.q h2 { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: 1.35rem; line-height: 1.25; text-wrap: balance; }
+.q p { margin: 0; max-width: 65ch; }
+.q ol { margin: 0; padding-left: 1.3em; display: grid; gap: 10px; }
+.q li { max-width: 65ch; padding-left: 4px; }
+.q li b { font-weight: 600; }
+.q .con { color: var(--muted); }
+.rec-box { border-left: 3px solid var(--ok); padding: 4px 0 4px 14px; display: grid; gap: 4px; }
+.rec-box .label { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ok); }
+.lineage { font-family: var(--font-mono); font-size: 0.85rem; background: var(--page); border: 1px solid var(--line); border-radius: 7px; padding: 10px 12px; overflow-x: auto; white-space: nowrap; }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Beltchain</h1>
+      <p>Belt promotions recorded on a public blockchain. Any student, gym or tournament can check a rank without calling the academy.</p>
+    </div>
+    <span class="chip" title="Contract tested locally, not deployed yet">Prototype · not on-chain yet</span>
+  </header>
+
+  <nav class="tabs" aria-label="Pages">
+    <a href="#certificate" data-tab="certificate" aria-current="page">Certificate</a>
+    <a href="#questions" data-tab="questions">Open questions<span class="count">5</span></a>
+  </nav>
+
+  <div class="page" id="page-certificate">
+  <div class="main">
+    <div class="cert-shell">
+      <div class="cert" id="cert" aria-label="Belt certificate preview">
+        <canvas class="guilloche" id="guilloche" aria-hidden="true"></canvas>
+        <div class="frame"></div>
+        <div class="specimen" aria-hidden="true">SPECIMEN</div>
+        <div class="body">
+          <div class="org" id="c-academy-top">Academy</div>
+          <h2>Certificate of Rank</h2>
+          <div class="center">
+            <div class="small">This certifies that</div>
+            <div class="student" id="c-student">Student</div>
+            <div class="small">has been promoted in Brazilian Jiu-Jitsu to the rank of</div>
+            <div class="rank" id="c-rank">Blue Belt</div>
+            <div class="belt" id="c-belt"><div class="bar" id="c-bar"></div></div>
+            <div class="where">at <b id="c-academy">Academy</b> on <b id="c-date">date</b></div>
+          </div>
+          <div class="foot">
+            <div class="sig"><div class="name" id="c-instructor">Instructor</div><div class="rule"></div><div class="label">Head Instructor</div></div>
+            <div class="seal">
+              <div class="qr" id="c-qr" role="img" aria-label="QR code of the on-chain fingerprint"></div>
+              <div class="rec" id="c-rec">Record #1 · Base</div>
+              <div class="fp" id="c-fp">0x…</div>
+            </div>
+            <div class="sig"><div class="name" id="c-date-sig"></div><div class="rule"></div><div class="label">Date of Promotion</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <aside class="side">
+      <form class="panel" id="form" autocomplete="off">
+        <h3>Promotion</h3>
+        <div class="field"><label for="student">Student name</label><input id="student" value="Jordan Reyes"></div>
+        <div class="row2">
+          <div class="field"><label for="belt">Belt</label>
+            <select id="belt">
+              <option value="0">White</option><option value="1" selected>Blue</option><option value="2">Purple</option>
+              <option value="3">Brown</option><option value="4">Black</option><option value="5">Red &amp; Black</option>
+              <option value="6">Red &amp; White</option><option value="7">Red</option>
+            </select>
+          </div>
+          <div class="field"><label for="degree" id="degree-label">Stripes</label>
+            <select id="degree"></select>
+          </div>
+        </div>
+        <div class="field"><label for="date">Promotion date</label><input id="date" type="date" value="2026-10-13"></div>
+        <div class="field"><label for="instructor">Instructor</label><input id="instructor" value="Prof. Example"></div>
+        <div class="field"><label for="academy">Academy</label><input id="academy" value="Example Jiu-Jitsu Academy"></div>
+      </form>
+
+      <section class="panel" aria-labelledby="rec-h">
+        <h3 id="rec-h">On-chain record</h3>
+        <div class="status"><span class="chip">Not written yet</span></div>
+        <dl class="record">
+          <div><dt>Network</dt><dd>Base Sepolia (testnet) → Base</dd></div>
+          <div><dt>Contract</dt><dd>BeltRegistry · deploy pending</dd></div>
+          <div><dt>Record / academy</dt><dd id="r-ids">#1 / #1</dd></div>
+          <div><dt>Instructor wallet (sample)</dt><dd id="r-wallet"></dd></div>
+          <div><dt>Fingerprint · keccak256</dt><dd id="r-fp"></dd></div>
+        </dl>
+        <button type="button" class="copy" id="copy">Copy fingerprint</button>
+      </section>
+    </aside>
+  </div>
+
+  <section class="how" aria-label="How it works">
+    <div class="step">
+      <span class="n">Step 1</span>
+      <h4>Academy gets verified</h4>
+      <p>The gym registers its wallet. The registry admin (a federation, or us to start) marks it verified, so random wallets can't issue belts.</p>
+    </div>
+    <div class="step">
+      <span class="n">Step 2</span>
+      <h4>Instructor records the promotion</h4>
+      <p>The academy authorizes its black belts. One transaction writes name, belt, stripes, date and an optional link to the instructor's own black-belt record, building lineage on-chain. Cost on Base is a fraction of a cent.</p>
+    </div>
+    <div class="step">
+      <span class="n">Step 3</span>
+      <h4>Anyone verifies</h4>
+      <p>Scan the QR. The page calls <code>fingerprint(recordId)</code> and checks it against the printed hash. Edits to the paper break the match; revoked records show as revoked.</p>
+    </div>
+  </section>
+  </div>
+
+  <div class="page" id="page-questions" hidden>
+    <div class="questions">
+      <p class="intro">Decisions to make before this goes past a prototype. The first one matters most: the blockchain proves who recorded a belt and when, but it can't tell whether that person had the standing to award it.</p>
+
+      <article class="q">
+        <span class="tag">Trust · most important</span>
+        <h2>How does the global jiu-jitsu community know a gym is legit?</h2>
+        <p>Right now one admin wallet (the deployer) verifies every academy. That works for a demo, but nobody will accept a single company as the gatekeeper of jiu-jitsu ranks.</p>
+        <ol>
+          <li><b>A federation verifies.</b> The IBJJF or a national body holds the verifier key. They already keep a black-belt registry, so it's credible. <span class="con">But the sport is split: unaffiliated gyms, Gracie lines and no-gi organizations sit outside any one federation.</span></li>
+          <li><b>Several verifiers; each reader picks whom to trust.</b> Anyone can vouch for an academy: IBJJF, AJP, a national body, or an affiliation like Alliance or Checkmat. A tournament sets its own rule, such as "accept if IBJJF or our affiliation vouches." This is how browsers trust a list of certificate authorities rather than one.</li>
+          <li><b>Lineage is the trust.</b> A black belt is legitimate because of who promoted them. Seed a small set of recognized root black belts, then every later black belt traces back through "promoted by record #X" links. A fake gym can write records, but its chain ends at nobody. The contract already stores this link.</li>
+          <li><b>Prove the wallet belongs to the gym.</b> The gym posts its wallet address on its website or Instagram, or signs a message. <span class="con">This proves identity, not quality, so it complements the options above rather than replacing them.</span></li>
+        </ol>
+        <div class="rec-box">
+          <span class="label">Recommended</span>
+          <p>Combine lineage (3) with multiple vouchers (2), and drop the single admin. The verify page shows the path and who vouches, and each viewer decides:</p>
+        </div>
+        <div class="lineage">Prof. Example → Head Instructor → Root black belt (recognized lineage) · IBJJF ✓ · Affiliation ✓</div>
+      </article>
+
+      <article class="q">
+        <span class="tag">Trust · bootstrapping</span>
+        <h2>Who are the first root black belts, and will they sign?</h2>
+        <p>Lineage only works once respected black belts are on-chain and have signed their students' promotions. It needs a few well-known professors to take part early. A natural first test is Alex's own lineage: who promoted them, and would that professor record it?</p>
+      </article>
+
+      <article class="q">
+        <span class="tag">Privacy</span>
+        <h2>Should student names be public and permanent?</h2>
+        <p>Anything written to the chain can never be removed. Option A stores the name in plain text, so anyone can search it, like a public belt registry. Option B stores only a hash of the name, so the paper certificate carries the name and a verifier checks that it matches. Option B is friendlier for kids and for privacy laws, but you can't look someone up by name.</p>
+      </article>
+
+      <article class="q">
+        <span class="tag">Operations</span>
+        <h2>Who holds the keys, and what happens when one is lost?</h2>
+        <p>Instructors need a wallet to sign promotions. Losing a key means losing the ability to issue or revoke belts under that identity. Options: a shared wallet that needs several people to approve, for academies; an easy wallet app with recovery for instructors; or a service that signs on their behalf, which brings back a middleman.</p>
+      </article>
+
+      <article class="q">
+        <span class="tag">Adoption</span>
+        <h2>How do existing belts get on-chain?</h2>
+        <p>Decades of past promotions, including instructors' own black belts needed for lineage, have to be backfilled. That needs a bulk-import path, and a way to mark a record as "recorded later" rather than written on promotion day.</p>
+      </article>
+    </div>
+  </div>
+
+  <footer class="site">Source, contract and tests: <a href="https://github.com/sphericalwave/beltchain">github.com/sphericalwave/beltchain</a></footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<script>
+(() => {
+  const BELTS = [
+    { name: "White Belt",       colors: ["#F2F2F0"],            bar: "#111" },
+    { name: "Blue Belt",        colors: ["#1A3FA8"],            bar: "#111" },
+    { name: "Purple Belt",      colors: ["#5B2A86"],            bar: "#111" },
+    { name: "Brown Belt",       colors: ["#5A3A22"],            bar: "#111" },
+    { name: "Black Belt",       colors: ["#151515"],            bar: "#B4232A" },
+    { name: "Red & Black Belt", colors: ["#B4232A", "#151515"], bar: "#F2F2F0" },
+    { name: "Red & White Belt", colors: ["#B4232A", "#F2F2F0"], bar: "#F2F2F0" },
+    { name: "Red Belt",         colors: ["#B4232A"],            bar: "#F2F2F0" },
+  ];
+  const SAMPLE_WALLET = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8"; // public Hardhat test account
+  const RECORD_ID = 1, ACADEMY_ID = 1;
+  const $ = (id) => document.getElementById(id);
+  const ordinal = (n) => n + (["th","st","nd","rd"][(n % 100 - 20) % 10] || ["th","st","nd","rd"][n % 100] || "th");
+
+  $("r-wallet").textContent = SAMPLE_WALLET;
+
+  function fillDegrees(keep) {
+    const black = Number($("belt").value) >= 4;
+    $("degree-label").textContent = black ? "Degree" : "Stripes";
+    const max = Number($("belt").value) === 4 ? 6 : black ? 0 : 4;
+    $("degree").innerHTML = Array.from({ length: max + 1 }, (_, i) => `<option value="${i}">${i}</option>`).join("");
+    $("degree").value = String(Math.min(keep, max));
+    $("degree").disabled = max === 0;
+  }
+
+  function render() {
+    const student = $("student").value.trim() || "Student Name";
+    const beltIdx = Number($("belt").value);
+    const degree = Number($("degree").value);
+    const belt = BELTS[beltIdx];
+    const dateStr = $("date").value || "2026-10-13";
+    const date = new Date(dateStr + "T00:00:00Z");
+    const prettyDate = date.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" });
+    const academy = $("academy").value.trim() || "Academy";
+    const instructor = $("instructor").value.trim() || "Instructor";
+
+    let rank = belt.name;
+    if (degree > 0) rank += beltIdx === 4 ? ` · ${ordinal(degree)} Degree` : ` · ${degree} Stripe${degree > 1 ? "s" : ""}`;
+
+    $("c-student").textContent = student;
+    $("c-rank").textContent = rank;
+    $("c-academy").textContent = academy;
+    $("c-academy-top").textContent = academy;
+    $("c-date").textContent = prettyDate;
+    $("c-date-sig").textContent = date.toLocaleDateString("en-US", { year: "numeric", month: "numeric", day: "numeric", timeZone: "UTC" });
+    $("c-instructor").textContent = instructor;
+
+    // Belt band: alternating segments for coral belts, rank bar with stripes near the tail
+    const beltEl = $("c-belt");
+    if (belt.colors.length === 1) beltEl.style.background = belt.colors[0];
+    else {
+      const [a, b] = belt.colors; const stops = [];
+      for (let i = 0; i < 10; i++) stops.push(`${i % 2 ? b : a} ${i * 10}% ${(i + 1) * 10}%`);
+      beltEl.style.background = `linear-gradient(90deg, ${stops.join(", ")})`;
+    }
+    const bar = $("c-bar");
+    bar.style.background = belt.bar;
+    bar.innerHTML = Array.from({ length: degree }, () => '<span class="stripe"></span>').join("");
+
+    // Same encoding as BeltRegistry.fingerprint(recordId)
+    const promotedOn = BigInt(Math.floor(date.getTime() / 1000));
+    let fp = "0x";
+    try {
+      fp = ethers.solidityPackedKeccak256(
+        ["uint256", "uint256", "address", "string", "uint8", "uint8", "uint64"],
+        [RECORD_ID, ACADEMY_ID, SAMPLE_WALLET, student, beltIdx, degree, promotedOn]
+      );
+    } catch (e) { fp = "unavailable (library failed to load)"; }
+    $("r-fp").textContent = fp;
+    $("r-ids").textContent = `#${RECORD_ID} / #${ACADEMY_ID}`;
+    $("c-fp").textContent = fp.length > 20 ? `${fp.slice(0, 10)}…${fp.slice(-8)}` : fp;
+    $("c-rec").textContent = `Record #${RECORD_ID} · Base`;
+
+    try {
+      const qr = qrcode(0, "M");
+      qr.addData(`beltchain:base:${RECORD_ID}:${fp}`);
+      qr.make();
+      $("c-qr").innerHTML = qr.createSvgTag({ cellSize: 4, margin: 0, scalable: true });
+    } catch (e) { $("c-qr").textContent = ""; }
+  }
+
+  // Guilloche: fine security-print rosette behind the text
+  function drawGuilloche() {
+    const c = $("guilloche"), r = c.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    c.width = Math.max(1, r.width * dpr); c.height = Math.max(1, r.height * dpr);
+    const g = c.getContext("2d");
+    g.scale(dpr, dpr);
+    g.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue("--guilloche").trim();
+    g.lineWidth = 0.6;
+    const cx = r.width / 2, cy = r.height / 2, R = r.width * 0.3;
+    for (let k = 0; k < 24; k++) {
+      g.beginPath();
+      for (let t = 0; t <= Math.PI * 2 + 0.01; t += 0.01) {
+        const rr = R * (0.72 + 0.18 * Math.sin(9 * t + k * 0.26) + 0.1 * Math.cos(4 * t));
+        const x = cx + rr * Math.cos(t + k * 0.02) * 1.35, y = cy + rr * Math.sin(t + k * 0.02);
+        t === 0 ? g.moveTo(x, y) : g.lineTo(x, y);
+      }
+      g.stroke();
+    }
+  }
+
+  $("form").addEventListener("submit", (e) => e.preventDefault());
+  $("belt").addEventListener("change", () => { fillDegrees(Number($("degree").value)); render(); });
+  ["student", "degree", "date", "instructor", "academy"].forEach((id) => $(id).addEventListener("input", render));
+  $("copy").addEventListener("click", async () => {
+    const btn = $("copy"), text = $("r-fp").textContent;
+    try { await navigator.clipboard.writeText(text); btn.textContent = "Copied"; }
+    catch { const s = getSelection(), rg = document.createRange(); rg.selectNodeContents($("r-fp")); s.removeAllRanges(); s.addRange(rg); btn.textContent = "Selected, press Copy"; }
+    setTimeout(() => (btn.textContent = "Copy fingerprint"), 1600);
+  });
+  new ResizeObserver(drawGuilloche).observe($("cert"));
+
+  function showTab(name) {
+    if (name !== "questions") name = "certificate";
+    document.querySelectorAll("nav.tabs a").forEach((a) => {
+      if (a.dataset.tab === name) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
+    });
+    $("page-certificate").hidden = name !== "certificate";
+    $("page-questions").hidden = name !== "questions";
+  }
+  document.querySelectorAll("nav.tabs a").forEach((a) => a.addEventListener("click", (e) => {
+    e.preventDefault();
+    showTab(a.dataset.tab);
+    try { history.replaceState(null, "", "#" + a.dataset.tab); } catch {}
+  }));
+  showTab(location.hash.slice(1));
+
+  fillDegrees(2);
+  render();
+})();
+</script>
