@@ -17,14 +17,19 @@
   --muted: #5B6683;
   --line: #D3D9E5;
   --accent: #1A3FA8;
+  --on-accent: #FFFFFF;
   --ok: #1D7A4E;
+  --ok-bg: #DDF3E7;
   --warn: #9A5B00;
   --warn-bg: #FFF2DC;
+  --danger: #B4232A;
   /* Paper is a physical object: fixed values, not themed */
   --paper: #F7F8FB;
   --paper-ink: #13204A;
   --paper-rule: #B9C2D6;
+  --paper-pending: #9A5B00;
   --guilloche: rgba(26, 63, 168, 0.07);
+  --night: #0E1322;
   --font-display: "Marcellus", "Trajan Pro", Georgia, serif;
   --font-body: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
@@ -32,12 +37,14 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --page: #0E1322; --panel: #161D31; --ink: #E5E9F3; --muted: #95A0BC; --line: #2A3450;
-    --accent: #7FA0FF; --ok: #5FD39A; --warn: #F2B65A; --warn-bg: #3A2A10; color-scheme: dark;
+    --accent: #7FA0FF; --on-accent: #0E1322; --ok: #5FD39A; --ok-bg: #12321F; --warn: #F2B65A; --warn-bg: #3A2A10;
+    --danger: #FF7A80; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --page: #0E1322; --panel: #161D31; --ink: #E5E9F3; --muted: #95A0BC; --line: #2A3450;
-  --accent: #7FA0FF; --ok: #5FD39A; --warn: #F2B65A; --warn-bg: #3A2A10; color-scheme: dark;
+  --accent: #7FA0FF; --on-accent: #0E1322; --ok: #5FD39A; --ok-bg: #12321F; --warn: #F2B65A; --warn-bg: #3A2A10;
+  --danger: #FF7A80; color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
@@ -53,6 +60,7 @@ header.top h1 { font-family: var(--font-display); font-weight: 400; font-size: 1
 header.top p { margin: 0; color: var(--muted); max-width: 60ch; }
 .chip { display: inline-flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; background: var(--warn-bg); color: var(--warn); white-space: nowrap; }
 .chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.chip.ok { background: var(--ok-bg); color: var(--ok); }
 
 .main { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 24px; align-items: start; }
 @media (max-width: 960px) { .main { grid-template-columns: minmax(0, 1fr); } }
@@ -69,31 +77,42 @@ header.top p { margin: 0; color: var(--muted); max-width: 60ch; }
 .cert .frame { position: absolute; inset: 2.6cqw; border: 0.25cqw solid var(--paper-ink); }
 .cert .frame::after { content: ""; position: absolute; inset: 0.7cqw; border: 0.1cqw solid var(--paper-rule); }
 .cert .body {
-  position: absolute; inset: 5cqw 7cqw 4.6cqw; display: grid;
-  grid-template-rows: auto auto 1fr auto; justify-items: center; text-align: center;
+  position: absolute; inset: 4.4cqw 7cqw 4.4cqw; display: grid;
+  grid-template-rows: auto 1fr auto; justify-items: center; text-align: center;
 }
+.cert .head { display: grid; justify-items: center; gap: 0.6cqw; }
+.cert .logo { width: 6.4cqw; height: 6.4cqw; object-fit: contain; }
 .cert .org { font-family: var(--font-body); font-size: 1.15cqw; font-weight: 600; letter-spacing: 0.4em; text-transform: uppercase; color: var(--paper-ink); opacity: .75; }
-.cert h2 { font-family: var(--font-display); font-weight: 400; font-size: 4.6cqw; letter-spacing: 0.08em; margin: 0.8cqw 0 0; line-height: 1.1; }
-.cert .center { display: grid; align-content: center; justify-items: center; gap: 1.1cqw; width: 100%; }
+.cert h2 { font-family: var(--font-display); font-weight: 400; font-size: 4.4cqw; letter-spacing: 0.08em; margin: 0; line-height: 1.1; }
+.cert .center { display: grid; align-content: center; justify-items: center; gap: 1cqw; width: 100%; }
 .cert .small { font-size: 1.45cqw; font-style: italic; font-family: Georgia, serif; color: var(--paper-ink); opacity: .8; }
-.cert .student { font-family: var(--font-display); font-size: 5.4cqw; line-height: 1.05; border-bottom: 0.12cqw solid var(--paper-rule); padding: 0 4cqw 0.6cqw; max-width: 100%; overflow-wrap: anywhere; }
-.cert .rank { font-family: var(--font-display); font-size: 3cqw; letter-spacing: 0.12em; text-transform: uppercase; }
-.belt { position: relative; width: 52cqw; height: 3.2cqw; border-radius: 0.3cqw; box-shadow: inset 0 -0.35cqw 0 rgba(0,0,0,.18), inset 0 0.25cqw 0 rgba(255,255,255,.25); }
+.cert .student { font-family: var(--font-display); font-size: 5.2cqw; line-height: 1.05; border-bottom: 0.12cqw solid var(--paper-rule); padding: 0 4cqw 0.6cqw; max-width: 100%; overflow-wrap: anywhere; }
+.cert .rank { font-family: var(--font-display); font-size: 2.9cqw; letter-spacing: 0.12em; text-transform: uppercase; }
+.belt { position: relative; width: 52cqw; height: 3cqw; border-radius: 0.3cqw; box-shadow: inset 0 -0.35cqw 0 rgba(0,0,0,.18), inset 0 0.25cqw 0 rgba(255,255,255,.25); }
 .belt .bar { position: absolute; top: 0; bottom: 0; right: 4cqw; width: 13cqw; display: flex; justify-content: center; gap: 1.1cqw; align-items: stretch; padding-inline: 1.4cqw; }
 .belt .stripe { width: 0.9cqw; background: #F4F4F4; box-shadow: inset 0 -0.2cqw 0 rgba(0,0,0,.15); }
 .cert .where { font-size: 1.5cqw; }
 .cert .where b { font-weight: 600; }
 
-.cert .foot { width: 100%; display: grid; grid-template-columns: 1fr auto 1fr; align-items: end; gap: 3cqw; }
-.sig { display: grid; justify-items: center; gap: 0.4cqw; }
-.sig .name { font-family: "Snell Roundhand", "Brush Script MT", cursive; font-size: 2.6cqw; line-height: 1; min-height: 2.6cqw; }
+.cert .foot { width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: end; gap: 3cqw; }
+.sig { display: grid; justify-items: center; gap: 0.4cqw; min-width: 0; }
+.sig .ink { height: 5.2cqw; width: 100%; display: flex; align-items: flex-end; justify-content: center; }
+.sig .ink img { max-height: 5.2cqw; max-width: 100%; display: block; }
+.sig .ink .typed { font-family: "Snell Roundhand", "Brush Script MT", cursive; font-size: 2.6cqw; line-height: 1; }
+.sig .ink .await {
+  border: 0.12cqw dashed var(--paper-pending); color: var(--paper-pending); font-size: 0.95cqw; font-weight: 600;
+  letter-spacing: 0.18em; text-transform: uppercase; padding: 0.7cqw 1.2cqw; margin-bottom: 0.4cqw;
+}
+.sig .ink .await.draft { border-color: var(--paper-rule); color: var(--paper-ink); opacity: .55; }
 .sig .rule { width: 100%; border-top: 0.12cqw solid var(--paper-ink); }
-.sig .label { font-size: 1cqw; letter-spacing: 0.25em; text-transform: uppercase; opacity: .7; }
+.sig .who { font-size: 1.2cqw; font-weight: 600; overflow-wrap: anywhere; }
+.sig .label { font-size: 0.95cqw; letter-spacing: 0.2em; text-transform: uppercase; opacity: .7; overflow-wrap: anywhere; }
 .seal { display: grid; justify-items: center; gap: 0.5cqw; }
-.seal .qr { width: 10cqw; height: 10cqw; background: #fff; padding: 0.5cqw; border: 0.12cqw solid var(--paper-rule); }
+.seal .qr { width: 9cqw; height: 9cqw; background: #fff; padding: 0.5cqw; border: 0.12cqw solid var(--paper-rule); }
 .seal .qr svg { width: 100%; height: 100%; display: block; }
 .seal .fp { font-family: var(--font-mono); font-size: 0.95cqw; letter-spacing: 0.05em; }
 .seal .rec { font-size: 0.95cqw; letter-spacing: 0.2em; text-transform: uppercase; opacity: .7; }
+.seal .rec.pending { color: var(--paper-pending); opacity: 1; font-weight: 600; }
 
 .specimen {
   position: absolute; top: 7cqw; right: -6cqw; transform: rotate(32deg);
@@ -105,25 +124,78 @@ header.top p { margin: 0; color: var(--muted); max-width: 60ch; }
 .side { display: grid; gap: 16px; min-width: 0; }
 .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 18px; display: grid; gap: 14px; min-width: 0; }
 .panel h3 { margin: 0; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
-.field { display: grid; gap: 4px; }
+.panel .hint { margin: 0; font-size: 0.85rem; color: var(--muted); }
+.field { display: grid; gap: 4px; min-width: 0; }
 .field label { font-size: 0.85rem; font-weight: 500; }
 .field input, .field select {
   font: inherit; color: var(--ink); background: var(--page); border: 1px solid var(--line); border-radius: 7px;
   padding: 9px 11px; min-height: 42px; width: 100%;
 }
-.field input:focus-visible, .field select:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.field input:focus-visible, .field select:focus-visible, button:focus-visible, .btn:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
 .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
 dl.record { margin: 0; display: grid; gap: 10px; }
 dl.record div { display: grid; gap: 2px; min-width: 0; }
 dl.record dt { font-size: 0.78rem; color: var(--muted); }
 dl.record dd { margin: 0; font-family: var(--font-mono); font-size: 0.82rem; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
-.status { display: flex; gap: 8px; align-items: center; }
-button.copy {
-  font: inherit; font-size: 0.85rem; font-weight: 500; color: var(--accent); background: transparent;
-  border: 1px solid var(--line); border-radius: 7px; padding: 8px 12px; min-height: 40px; cursor: pointer; justify-self: start;
+.status { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+/* Buttons */
+.btn, button.copy {
+  font: inherit; font-size: 0.88rem; font-weight: 500; color: var(--accent); background: transparent;
+  border: 1px solid var(--line); border-radius: 7px; padding: 8px 14px; min-height: 42px; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-align: center;
 }
-button.copy:hover { border-color: var(--accent); }
+.btn:hover, button.copy:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent); font-weight: 600; }
+.btn.danger { color: var(--danger); }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn input[type="file"] { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+button.copy { justify-self: start; }
+.btnrow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.btnrow .spacer { flex: 1; }
+.err { margin: 0; color: var(--danger); font-size: 0.85rem; }
+
+/* Signers list */
+.signers { display: grid; gap: 10px; }
+.signer { display: grid; gap: 2px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; min-width: 0; }
+.signer .role { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.signer .nm { font-weight: 600; overflow-wrap: anywhere; }
+.signer .st { font-size: 0.85rem; color: var(--muted); overflow-wrap: anywhere; }
+.signer .st.done { color: var(--ok); }
+.signer .st.wait { color: var(--warn); }
+.signer .st.block { color: var(--danger); }
+
+/* ---------- Gym profile ---------- */
+.profile { display: grid; grid-template-columns: minmax(0, 380px) minmax(0, 1fr); gap: 24px; align-items: start; }
+@media (max-width: 900px) { .profile { grid-template-columns: minmax(0, 1fr); } }
+.previews { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.tile { border-radius: 8px; aspect-ratio: 1; display: grid; place-items: center; padding: 18%; border: 1px solid var(--line); max-width: 100%; }
+.tile img { width: 100%; height: 100%; object-fit: contain; }
+.tile.paper { background: var(--paper); color: var(--paper-ink); }
+.tile.night { background: var(--night); color: #95A0BC; }
+.tile .empty { font-size: 0.8rem; text-align: center; }
+.tile-label { font-size: 0.78rem; color: var(--muted); text-align: center; margin-top: 4px; }
+.crop { display: grid; gap: 10px; }
+.crop canvas { width: 100%; max-width: 320px; aspect-ratio: 1; border-radius: 8px; border: 1px solid var(--line); touch-action: none; cursor: grab; justify-self: center; }
+.crop input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 32px; }
+.mono { font-family: var(--font-mono); font-size: 0.8rem; overflow-wrap: anywhere; color: var(--muted); }
+
+.instructors { display: grid; gap: 16px; }
+.icard { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 18px; display: grid; gap: 12px; min-width: 0; }
+.icard .sigview { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; min-height: 96px; display: grid; place-items: center; padding: 12px; }
+.icard .sigview img { max-height: 90px; }
+.icard .sigview .empty { color: #5B6683; font-size: 0.85rem; }
+.pad { position: relative; background: var(--paper); border: 1px solid var(--line); border-radius: 8px; }
+.pad canvas { display: block; width: 100%; aspect-ratio: 3 / 1; touch-action: none; cursor: crosshair; }
+.pad .baseline { position: absolute; left: 6%; right: 6%; bottom: 26%; border-top: 1px dashed #B9C2D6; pointer-events: none; }
+.pad .x { position: absolute; left: 3%; bottom: 26%; color: #8A94AE; font-size: 0.9rem; pointer-events: none; }
+
+.toast {
+  position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  background: var(--ink); color: var(--page); padding: 10px 16px; border-radius: 8px; font-size: 0.9rem; font-weight: 500;
+  box-shadow: 0 6px 24px rgba(0,0,0,.25); max-width: calc(100% - 32px); z-index: 10;
+}
 
 /* ---------- How it works ---------- */
 .how { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
@@ -137,9 +209,9 @@ footer.site { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var
 footer.site a { color: var(--accent); }
 
 /* ---------- Tabs ---------- */
-nav.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); }
+nav.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); overflow-x: auto; }
 nav.tabs a {
-  color: var(--muted); text-decoration: none; font-weight: 500; padding: 10px 14px; min-height: 44px;
+  color: var(--muted); text-decoration: none; font-weight: 500; padding: 10px 14px; min-height: 44px; white-space: nowrap;
   display: inline-flex; align-items: center; border-bottom: 2px solid transparent; margin-bottom: -1px;
 }
 nav.tabs a:hover { color: var(--ink); }
@@ -163,6 +235,8 @@ nav.tabs .count { font-family: var(--font-mono); font-size: 0.75rem; margin-left
 .rec-box .label { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ok); }
 .lineage { font-family: var(--font-mono); font-size: 0.85rem; background: var(--page); border: 1px solid var(--line); border-radius: 7px; padding: 10px 12px; overflow-x: auto; white-space: nowrap; }
 </style>
+</head>
+<body>
 
 <div class="wrap">
   <header class="top">
@@ -175,9 +249,11 @@ nav.tabs .count { font-family: var(--font-mono); font-size: 0.75rem; margin-left
 
   <nav class="tabs" aria-label="Pages">
     <a href="#certificate" data-tab="certificate" aria-current="page">Certificate</a>
-    <a href="#questions" data-tab="questions">Open questions<span class="count">5</span></a>
+    <a href="#profile" data-tab="profile">Gym profile</a>
+    <a href="#questions" data-tab="questions">Open questions<span class="count">7</span></a>
   </nav>
 
+  <!-- ===================== Certificate ===================== -->
   <div class="page" id="page-certificate">
   <div class="main">
     <div class="cert-shell">
@@ -186,8 +262,11 @@ nav.tabs .count { font-family: var(--font-mono); font-size: 0.75rem; margin-left
         <div class="frame"></div>
         <div class="specimen" aria-hidden="true">SPECIMEN</div>
         <div class="body">
-          <div class="org" id="c-academy-top">Academy</div>
-          <h2>Certificate of Rank</h2>
+          <div class="head">
+            <img class="logo" id="c-logo" alt="" hidden>
+            <div class="org" id="c-academy-top">Academy</div>
+            <h2>Certificate of Rank</h2>
+          </div>
           <div class="center">
             <div class="small">This certifies that</div>
             <div class="student" id="c-student">Student</div>
@@ -197,13 +276,13 @@ nav.tabs .count { font-family: var(--font-mono); font-size: 0.75rem; margin-left
             <div class="where">at <b id="c-academy">Academy</b> on <b id="c-date">date</b></div>
           </div>
           <div class="foot">
-            <div class="sig"><div class="name" id="c-instructor">Instructor</div><div class="rule"></div><div class="label">Head Instructor</div></div>
+            <div class="sig" id="c-sig1"></div>
             <div class="seal">
               <div class="qr" id="c-qr" role="img" aria-label="QR code of the on-chain fingerprint"></div>
               <div class="rec" id="c-rec">Record #1 · Base</div>
               <div class="fp" id="c-fp">0x…</div>
             </div>
-            <div class="sig"><div class="name" id="c-date-sig"></div><div class="rule"></div><div class="label">Date of Promotion</div></div>
+            <div class="sig" id="c-sig2"></div>
           </div>
         </div>
       </div>
@@ -226,18 +305,30 @@ nav.tabs .count { font-family: var(--font-mono); font-size: 0.75rem; margin-left
           </div>
         </div>
         <div class="field"><label for="date">Promotion date</label><input id="date" type="date" value="2026-10-13"></div>
-        <div class="field"><label for="instructor">Instructor</label><input id="instructor" value="Prof. Example"></div>
-        <div class="field"><label for="academy">Academy</label><input id="academy" value="Example Jiu-Jitsu Academy"></div>
+        <div class="field"><label for="promoter">Promoting instructor</label><select id="promoter"></select></div>
+        <div class="field"><label for="cosigner">Second signature (optional)</label><select id="cosigner"></select></div>
+        <p class="hint">Instructors, signatures and the gym logo come from the <a href="#profile" data-goto="profile">Gym profile</a>.</p>
       </form>
+
+      <section class="panel" aria-labelledby="sig-h">
+        <h3 id="sig-h">Signatures</h3>
+        <div class="status"><span class="chip" id="s-chip">Draft</span></div>
+        <div class="signers" id="s-list"></div>
+        <p class="hint" id="s-hint"></p>
+        <div class="btnrow">
+          <button type="button" class="btn primary" id="s-action">Record and sign</button>
+          <button type="button" class="btn" id="s-reset" hidden>Start a new draft</button>
+        </div>
+        <p class="hint">Prototype: you act for each instructor here. On-chain, only that instructor's own wallet can sign.</p>
+      </section>
 
       <section class="panel" aria-labelledby="rec-h">
         <h3 id="rec-h">On-chain record</h3>
-        <div class="status"><span class="chip">Not written yet</span></div>
         <dl class="record">
           <div><dt>Network</dt><dd>Base Sepolia (testnet) → Base</dd></div>
           <div><dt>Contract</dt><dd>BeltRegistry · deploy pending</dd></div>
           <div><dt>Record / academy</dt><dd id="r-ids">#1 / #1</dd></div>
-          <div><dt>Instructor wallet (sample)</dt><dd id="r-wallet"></dd></div>
+          <div><dt>Logo hash · keccak256</dt><dd id="r-logo">none</dd></div>
           <div><dt>Fingerprint · keccak256</dt><dd id="r-fp"></dd></div>
         </dl>
         <button type="button" class="copy" id="copy">Copy fingerprint</button>
@@ -249,21 +340,73 @@ nav.tabs .count { font-family: var(--font-mono); font-size: 0.75rem; margin-left
     <div class="step">
       <span class="n">Step 1</span>
       <h4>Academy gets verified</h4>
-      <p>The gym registers its wallet. The registry admin (a federation, or us to start) marks it verified, so random wallets can't issue belts.</p>
+      <p>The gym registers its wallet and logo. The registry admin (a federation, or us to start) marks it verified, so random wallets can't issue belts.</p>
     </div>
     <div class="step">
       <span class="n">Step 2</span>
-      <h4>Instructor records the promotion</h4>
-      <p>The academy authorizes its black belts. One transaction writes name, belt, stripes, date and an optional link to the instructor's own black-belt record, building lineage on-chain. Cost on Base is a fraction of a cent.</p>
+      <h4>Instructors sign the promotion</h4>
+      <p>The promoting instructor records the belt with their own wallet, which is their signature. A second instructor, such as the head instructor, can be named; the certificate stays pending until they sign too.</p>
     </div>
     <div class="step">
       <span class="n">Step 3</span>
       <h4>Anyone verifies</h4>
-      <p>Scan the QR. The page calls <code>fingerprint(recordId)</code> and checks it against the printed hash. Edits to the paper break the match; revoked records show as revoked.</p>
+      <p>Scan the QR. The page calls <code>fingerprint(recordId)</code> and <code>isComplete(recordId)</code>, and checks the printed logo and signatures against their hashes on the record.</p>
     </div>
   </section>
   </div>
 
+  <!-- ===================== Gym profile ===================== -->
+  <div class="page" id="page-profile" hidden>
+    <div class="profile">
+      <section class="panel" aria-labelledby="gym-h">
+        <h3 id="gym-h">Gym</h3>
+        <div class="field"><label for="p-academy">Academy name</label><input id="p-academy"></div>
+
+        <div class="field">
+          <span style="font-size:0.85rem;font-weight:500">Logo</span>
+          <div class="previews">
+            <div><div class="tile paper" id="p-logo-light"></div><div class="tile-label">On certificate paper</div></div>
+            <div><div class="tile night" id="p-logo-dark"></div><div class="tile-label">On a dark background</div></div>
+          </div>
+          <p class="hint" id="p-logo-note"></p>
+        </div>
+
+        <div class="crop" id="crop" hidden>
+          <canvas id="crop-canvas" width="320" height="320" aria-label="Drag to position your logo"></canvas>
+          <div class="field">
+            <label for="crop-zoom">Zoom</label>
+            <input type="range" id="crop-zoom" min="0" max="100" value="0">
+          </div>
+          <p class="hint">Drag to position. At the lowest zoom the whole logo fits.</p>
+          <div class="btnrow">
+            <button type="button" class="btn" id="crop-cancel">Cancel</button>
+            <span class="spacer"></span>
+            <button type="button" class="btn primary" id="crop-use">Use this logo</button>
+          </div>
+        </div>
+
+        <div class="btnrow" id="logo-actions">
+          <label class="btn primary" for="logo-file" style="position:relative">Upload logo<input type="file" id="logo-file" accept="image/png,image/jpeg,image/webp"></label>
+          <button type="button" class="btn danger" id="logo-remove">Remove logo</button>
+        </div>
+        <p class="err" id="logo-err" role="alert" hidden></p>
+        <p class="hint">PNG, JPEG or WebP, up to 5 MB, at least 128 × 128 px. Saved as a 512 × 512 PNG. Transparent backgrounds look best on both previews.</p>
+        <p class="mono" id="p-logo-hash"></p>
+      </section>
+
+      <section aria-labelledby="ins-h" style="display:grid;gap:16px;min-width:0">
+        <div class="btnrow">
+          <h3 id="ins-h" style="margin:0;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)">Instructors</h3>
+          <span class="spacer"></span>
+          <button type="button" class="btn" id="add-instructor">Add instructor</button>
+        </div>
+        <p class="hint" style="margin:0;color:var(--muted);font-size:0.85rem">Each instructor saves their own signature from their own wallet; the gym owner can add or remove instructors but can't set anyone's signature.</p>
+        <div class="instructors" id="instructors"></div>
+      </section>
+    </div>
+  </div>
+
+  <!-- ===================== Open questions ===================== -->
   <div class="page" id="page-questions" hidden>
     <div class="questions">
       <p class="intro">Decisions to make before this goes past a prototype. The first one matters most: the blockchain proves who recorded a belt and when, but it can't tell whether that person had the standing to award it.</p>
@@ -292,6 +435,18 @@ nav.tabs .count { font-family: var(--font-mono); font-size: 0.75rem; margin-left
       </article>
 
       <article class="q">
+        <span class="tag">Signatures</span>
+        <h2>What happens when a second signer never signs?</h2>
+        <p>Today a pending certificate stays pending until the named co-signer signs, or until the promoting instructor or gym owner revokes it and records it again. If the co-signer leaves the gym, they can no longer sign. Options: let pending records expire after a set time, let the owner swap in a different co-signer, or require the head instructor's signature on every black-belt promotion.</p>
+      </article>
+
+      <article class="q">
+        <span class="tag">Signatures</span>
+        <h2>Where do logo and signature images live?</h2>
+        <p>The chain stores only each image's hash, which proves a printed image is the one on record. The images themselves need a home that lasts as long as the belts do. Options: content-addressed storage such as IPFS or Arweave (the address is the hash), the gym's own website, or a Beltchain server. In this prototype they stay in your browser.</p>
+      </article>
+
+      <article class="q">
         <span class="tag">Privacy</span>
         <h2>Should student names be public and permanent?</h2>
         <p>Anything written to the chain can never be removed. Option A stores the name in plain text, so anyone can search it, like a public belt registry. Option B stores only a hash of the name, so the paper certificate carries the name and a verifier checks that it matches. Option B is friendlier for kids and for privacy laws, but you can't look someone up by name.</p>
@@ -314,6 +469,8 @@ nav.tabs .count { font-family: var(--font-mono); font-size: 0.75rem; margin-left
   <footer class="site">Source, contract and tests: <a href="https://github.com/sphericalwave/beltchain">github.com/sphericalwave/beltchain</a></footer>
 </div>
 
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
 <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <script>
@@ -328,13 +485,208 @@ nav.tabs .count { font-family: var(--font-mono); font-size: 0.75rem; margin-left
     { name: "Red & White Belt", colors: ["#B4232A", "#F2F2F0"], bar: "#F2F2F0" },
     { name: "Red Belt",         colors: ["#B4232A"],            bar: "#F2F2F0" },
   ];
-  const SAMPLE_WALLET = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8"; // public Hardhat test account
+  // Public Hardhat test accounts, used as sample instructor wallets
+  const SAMPLE_WALLETS = ["0x70997970C51812dc3A010C7d01b50e0d17dc79C8", "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC"];
+  const ZERO = "0x0000000000000000000000000000000000000000";
   const RECORD_ID = 1, ACADEMY_ID = 1;
+  const INK = "#13204A";
+  const MAX_INSTRUCTORS = 8;
+  const LOGO_LIMIT = { bytes: 5 * 1024 * 1024, minPx: 128, outPx: 512 };
+  const SIG_LIMIT = { bytes: 2 * 1024 * 1024, outW: 900, outH: 300 };
+  const IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"];
+  // Versioned key. A new version gets a new key; older keys are never deleted.
+  const STORE_KEY = "beltchain.profile.v1";
+
   const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const ordinal = (n) => n + (["th","st","nd","rd"][(n % 100 - 20) % 10] || ["th","st","nd","rd"][n % 100] || "th");
+  const short = (h) => (h && h.length > 20 ? `${h.slice(0, 10)}…${h.slice(-8)}` : h || "");
+  const when = (ms) => new Date(ms).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" });
+  const kb = (dataUrl) => Math.round((dataUrl.length * 3) / 4 / 1024);
 
-  $("r-wallet").textContent = SAMPLE_WALLET;
+  // ---------- Feedback ----------
+  let toastTimer;
+  function toast(msg) {
+    const t = $("toast");
+    t.textContent = msg; t.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => (t.hidden = true), 2400);
+  }
 
+  // ---------- Hashing (same bytes the chain would hash) ----------
+  function dataUrlBytes(url) {
+    const bin = atob(url.split(",")[1]);
+    const out = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+    return out;
+  }
+  function hashImage(url) {
+    try { return ethers.keccak256(dataUrlBytes(url)); } catch { return null; }
+  }
+
+  // ---------- Image helpers ----------
+  function loadImage(src) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error("unreadable"));
+      img.src = src;
+    });
+  }
+  function readFile(file) {
+    return new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(r.result);
+      r.onerror = () => reject(r.error);
+      r.readAsDataURL(file);
+    });
+  }
+  // Crop a canvas to its inked pixels and fit it into maxW × maxH as a transparent PNG
+  function trimToPng(src, maxW, maxH) {
+    const g = src.getContext("2d");
+    const { width: w, height: h } = src;
+    const data = g.getImageData(0, 0, w, h).data;
+    let x0 = w, y0 = h, x1 = -1, y1 = -1;
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      if (data[(y * w + x) * 4 + 3] > 16) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+    }
+    if (x1 < 0) return null;
+    const pad = 12, bw = x1 - x0 + 1, bh = y1 - y0 + 1;
+    const scale = Math.min(1, (maxW - pad * 2) / bw, (maxH - pad * 2) / bh);
+    const out = document.createElement("canvas");
+    out.width = Math.round(bw * scale) + pad * 2;
+    out.height = Math.round(bh * scale) + pad * 2;
+    out.getContext("2d").drawImage(src, x0, y0, bw, bh, pad, pad, bw * scale, bh * scale);
+    return out.toDataURL("image/png");
+  }
+  function meanLuminance(img) {
+    const c = document.createElement("canvas"); c.width = c.height = 64;
+    const g = c.getContext("2d"); g.drawImage(img, 0, 0, 64, 64);
+    const d = g.getImageData(0, 0, 64, 64).data;
+    let sum = 0, n = 0;
+    for (let i = 0; i < d.length; i += 4) if (d[i + 3] > 64) { sum += (0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2]) / 255; n++; }
+    return n ? sum / n : null;
+  }
+
+  // ---------- Samples (shown until the gym uploads its own) ----------
+  function sampleSignature(name) {
+    const c = document.createElement("canvas"); c.width = 900; c.height = 300;
+    const g = c.getContext("2d");
+    g.fillStyle = INK; g.strokeStyle = INK;
+    g.font = "italic 112px 'Snell Roundhand', 'Brush Script MT', 'Segoe Script', cursive";
+    g.textBaseline = "alphabetic";
+    const text = name.replace(/^Prof\.\s*/, "");
+    g.fillText(text, 30, 190);
+    const w = Math.min(840, g.measureText(text).width);
+    g.lineWidth = 3; g.lineCap = "round";
+    g.beginPath(); g.moveTo(40, 225); g.bezierCurveTo(w * 0.4, 205, w * 0.7, 250, w + 30, 215); g.stroke();
+    return trimToPng(c, SIG_LIMIT.outW, SIG_LIMIT.outH);
+  }
+  function sampleLogo(academyName) {
+    const S = LOGO_LIMIT.outPx, c = document.createElement("canvas"); c.width = c.height = S;
+    const g = c.getContext("2d");
+    g.fillStyle = "#1A3FA8"; g.beginPath(); g.arc(S / 2, S / 2, S * 0.47, 0, Math.PI * 2); g.fill();
+    g.strokeStyle = "#F7F8FB"; g.lineWidth = S * 0.018; g.beginPath(); g.arc(S / 2, S / 2, S * 0.4, 0, Math.PI * 2); g.stroke();
+    const initials = academyName.split(/\s+/).filter((w) => /^[A-Za-z]/.test(w)).slice(0, 2).map((w) => w[0].toUpperCase()).join("") || "BJJ";
+    g.fillStyle = "#F7F8FB"; g.textAlign = "center"; g.textBaseline = "middle";
+    g.font = `${S * 0.3}px Marcellus, Georgia, serif`; g.fillText(initials, S / 2, S * 0.47);
+    g.font = `600 ${S * 0.06}px "IBM Plex Sans", sans-serif`; g.fillText("JIU-JITSU", S / 2, S * 0.68);
+    return c.toDataURL("image/png");
+  }
+
+  // ---------- Profile store ----------
+  function defaultProfile() {
+    return {
+      version: 1,
+      academy: { name: "Example Jiu-Jitsu Academy", logo: null, logoHash: null, logoIsSample: true },
+      instructors: [
+        { wallet: SAMPLE_WALLETS[0], name: "Prof. Example", title: "Black Belt · Instructor", signature: null, signatureHash: null, signatureIsSample: true },
+        { wallet: SAMPLE_WALLETS[1], name: "Prof. Head Example", title: "Head Instructor · 3rd Degree Black Belt", signature: null, signatureHash: null, signatureIsSample: true },
+      ],
+    };
+  }
+  // Fill missing fields with defaults; keep anything unknown so a newer page's data survives.
+  function normalize(p) {
+    const d = defaultProfile();
+    const academy = { ...d.academy, ...(p && typeof p.academy === "object" ? p.academy : {}) };
+    const list = Array.isArray(p?.instructors) ? p.instructors.filter((i) => i && typeof i.wallet === "string") : d.instructors;
+    const instructors = list.map((i) => ({ name: "", title: "", signature: null, signatureHash: null, signatureIsSample: false, ...i }));
+    return { ...p, version: 1, academy, instructors: instructors.length ? instructors : d.instructors };
+  }
+  let storageOK = true;
+  function loadProfile() {
+    let raw = null;
+    try { raw = localStorage.getItem(STORE_KEY); } catch { storageOK = false; }
+    if (!raw) return defaultProfile();
+    try { return normalize(JSON.parse(raw)); }
+    catch {
+      // Never overwrite data we couldn't read: set it aside first.
+      try { localStorage.setItem(`${STORE_KEY}.unreadable-${Date.now()}`, raw); } catch {}
+      return defaultProfile();
+    }
+  }
+  function persist() {
+    // Sample images are regenerated on load, so they aren't stored.
+    const copy = JSON.parse(JSON.stringify(profile));
+    if (copy.academy.logoIsSample) { copy.academy.logo = null; copy.academy.logoHash = null; }
+    copy.instructors.forEach((i) => { if (i.signatureIsSample) { i.signature = null; i.signatureHash = null; } });
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(copy)); return true; }
+    catch (e) {
+      if (storageOK) toast(e && e.name === "QuotaExceededError"
+        ? "Couldn't save on this device: storage is full. Use a smaller logo or remove an instructor."
+        : "This browser isn't saving changes, so they'll be lost on reload.");
+      storageOK = false;
+      return false;
+    }
+  }
+  let saveTimer;
+  const saveSoon = () => { clearTimeout(saveTimer); saveTimer = setTimeout(persist, 400); };
+
+  function fillSamples() {
+    if (profile.academy.logoIsSample && !profile.academy.logo) {
+      profile.academy.logo = sampleLogo(profile.academy.name);
+      profile.academy.logoHash = hashImage(profile.academy.logo);
+    }
+    profile.instructors.forEach((i) => {
+      if (i.signatureIsSample && !i.signature) { i.signature = sampleSignature(i.name || "Instructor"); i.signatureHash = hashImage(i.signature); }
+    });
+  }
+
+  let profile = loadProfile();
+  const byWallet = (w) => profile.instructors.find((i) => i.wallet === w) || null;
+
+  // ---------- Promotion record (simulated chain state) ----------
+  // null = draft. Otherwise mirrors BeltRegistry.Promotion: who signed, when, and the
+  // signature in effect at that moment (later profile changes don't touch it).
+  let record = null;
+
+  function snapshot(ins, role) {
+    return { wallet: ins.wallet, role, name: ins.name, title: ins.title, signedAt: null, signature: null, signatureHash: null };
+  }
+  function signAs(entry) {
+    const ins = byWallet(entry.wallet);
+    entry.signedAt = Date.now();
+    entry.signature = ins.signature;
+    entry.signatureHash = ins.signatureHash;
+  }
+  function draftSigners() {
+    const p = byWallet($("promoter").value), c = byWallet($("cosigner").value);
+    return [p && snapshot(p, "promoter"), c && snapshot(c, "cosigner")].filter(Boolean);
+  }
+  const signers = () => (record ? record.signers : draftSigners());
+  function status() {
+    if (!record) return "draft";
+    return record.signers.every((s) => s.signedAt) ? "complete" : "pending";
+  }
+  // Why an instructor can't sign right now (mirrors the contract's checks), or null
+  function blocker(entry) {
+    const ins = byWallet(entry.wallet);
+    if (!ins) return `${entry.name} is no longer an instructor here, so they can't sign. Start a new draft.`;
+    if (!ins.signature) return `${ins.name} needs a saved signature first. Add one in Gym profile.`;
+    return null;
+  }
+
+  // ---------- Form ----------
   function fillDegrees(keep) {
     const black = Number($("belt").value) >= 4;
     $("degree-label").textContent = black ? "Degree" : "Stripes";
@@ -342,6 +694,30 @@ nav.tabs .count { font-family: var(--font-mono); font-size: 0.75rem; margin-left
     $("degree").innerHTML = Array.from({ length: max + 1 }, (_, i) => `<option value="${i}">${i}</option>`).join("");
     $("degree").value = String(Math.min(keep, max));
     $("degree").disabled = max === 0;
+  }
+  function fillSignerSelects(defaultCosigner) {
+    const prevP = $("promoter").value, prevC = $("cosigner").value;
+    $("promoter").innerHTML = profile.instructors.map((i) => `<option value="${esc(i.wallet)}">${esc(i.name || "Unnamed instructor")}</option>`).join("");
+    $("promoter").value = byWallet(prevP) ? prevP : profile.instructors[0].wallet;
+    const others = profile.instructors.filter((i) => i.wallet !== $("promoter").value);
+    $("cosigner").innerHTML = `<option value="">None</option>` + others.map((i) => `<option value="${esc(i.wallet)}">${esc(i.name || "Unnamed instructor")}</option>`).join("");
+    const wanted = defaultCosigner !== undefined ? defaultCosigner : prevC;
+    $("cosigner").value = others.some((i) => i.wallet === wanted) ? wanted : "";
+  }
+
+  // ---------- Certificate ----------
+  function sigBlock(el, entry, st) {
+    if (!entry) { el.innerHTML = ""; return; }
+    let ink;
+    if (entry.signedAt && entry.signature) ink = `<img src="${entry.signature}" alt="Signature of ${esc(entry.name)}">`;
+    else if (entry.signedAt) ink = `<span class="typed">${esc(entry.name)}</span>`;
+    else if (st === "draft") ink = `<span class="await draft">Signs when recorded</span>`;
+    else ink = `<span class="await">Awaiting signature</span>`;
+    el.innerHTML = `<div class="ink">${ink}</div><div class="rule"></div><div class="who">${esc(entry.name)}</div><div class="label">${esc(entry.title || "Instructor")}</div>`;
+  }
+  function dateBlock(el, date) {
+    const d = date.toLocaleDateString("en-US", { year: "numeric", month: "numeric", day: "numeric", timeZone: "UTC" });
+    el.innerHTML = `<div class="ink"><span class="typed">${esc(d)}</span></div><div class="rule"></div><div class="who">&nbsp;</div><div class="label">Date of Promotion</div>`;
   }
 
   function render() {
@@ -352,8 +728,7 @@ nav.tabs .count { font-family: var(--font-mono); font-size: 0.75rem; margin-left
     const dateStr = $("date").value || "2026-10-13";
     const date = new Date(dateStr + "T00:00:00Z");
     const prettyDate = date.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" });
-    const academy = $("academy").value.trim() || "Academy";
-    const instructor = $("instructor").value.trim() || "Instructor";
+    const academy = profile.academy.name.trim() || "Academy";
 
     let rank = belt.name;
     if (degree > 0) rank += beltIdx === 4 ? ` · ${ordinal(degree)} Degree` : ` · ${degree} Stripe${degree > 1 ? "s" : ""}`;
@@ -363,8 +738,9 @@ nav.tabs .count { font-family: var(--font-mono); font-size: 0.75rem; margin-left
     $("c-academy").textContent = academy;
     $("c-academy-top").textContent = academy;
     $("c-date").textContent = prettyDate;
-    $("c-date-sig").textContent = date.toLocaleDateString("en-US", { year: "numeric", month: "numeric", day: "numeric", timeZone: "UTC" });
-    $("c-instructor").textContent = instructor;
+    const logo = $("c-logo");
+    if (profile.academy.logo) { logo.src = profile.academy.logo; logo.alt = `${academy} logo`; logo.hidden = false; }
+    else logo.hidden = true;
 
     // Belt band: alternating segments for coral belts, rank bar with stripes near the tail
     const beltEl = $("c-belt");
@@ -378,19 +754,29 @@ nav.tabs .count { font-family: var(--font-mono); font-size: 0.75rem; margin-left
     bar.style.background = belt.bar;
     bar.innerHTML = Array.from({ length: degree }, () => '<span class="stripe"></span>').join("");
 
+    // Signature blocks
+    const st = status(), list = signers();
+    const promoter = list.find((s) => s.role === "promoter"), cosigner = list.find((s) => s.role === "cosigner");
+    sigBlock($("c-sig1"), promoter, st);
+    if (cosigner) sigBlock($("c-sig2"), cosigner, st); else dateBlock($("c-sig2"), date);
+
     // Same encoding as BeltRegistry.fingerprint(recordId)
     const promotedOn = BigInt(Math.floor(date.getTime() / 1000));
     let fp = "0x";
     try {
       fp = ethers.solidityPackedKeccak256(
-        ["uint256", "uint256", "address", "string", "uint8", "uint8", "uint64"],
-        [RECORD_ID, ACADEMY_ID, SAMPLE_WALLET, student, beltIdx, degree, promotedOn]
+        ["uint256", "uint256", "address", "address", "string", "uint8", "uint8", "uint64"],
+        [RECORD_ID, ACADEMY_ID, promoter ? promoter.wallet : ZERO, cosigner ? cosigner.wallet : ZERO, student, beltIdx, degree, promotedOn]
       );
     } catch (e) { fp = "unavailable (library failed to load)"; }
     $("r-fp").textContent = fp;
     $("r-ids").textContent = `#${RECORD_ID} / #${ACADEMY_ID}`;
-    $("c-fp").textContent = fp.length > 20 ? `${fp.slice(0, 10)}…${fp.slice(-8)}` : fp;
-    $("c-rec").textContent = `Record #${RECORD_ID} · Base`;
+    $("r-logo").textContent = profile.academy.logoHash || "none";
+    $("c-fp").textContent = short(fp);
+    const signed = list.filter((s) => s.signedAt).length;
+    const rec = $("c-rec");
+    rec.textContent = st === "pending" ? `Pending · ${signed} of ${list.length} signed` : st === "draft" ? `Draft · Record #${RECORD_ID}` : `Record #${RECORD_ID} · Base`;
+    rec.classList.toggle("pending", st !== "complete");
 
     try {
       const qr = qrcode(0, "M");
@@ -398,9 +784,379 @@ nav.tabs .count { font-family: var(--font-mono); font-size: 0.75rem; margin-left
       qr.make();
       $("c-qr").innerHTML = qr.createSvgTag({ cellSize: 4, margin: 0, scalable: true });
     } catch (e) { $("c-qr").textContent = ""; }
+
+    renderSignersPanel(st, list);
   }
 
-  // Guilloche: fine security-print rosette behind the text
+  function renderSignersPanel(st, list) {
+    const chip = $("s-chip");
+    const signed = list.filter((s) => s.signedAt).length;
+    chip.textContent = st === "draft" ? "Draft · not recorded" : st === "pending" ? `Pending · ${signed} of ${list.length} signed` : "Complete · all signed";
+    chip.classList.toggle("ok", st === "complete");
+
+    $("s-list").innerHTML = list.map((s) => {
+      let line, cls;
+      if (s.signedAt) { line = `Signed ${when(s.signedAt)} · signature ${short(s.signatureHash)}`; cls = "done"; }
+      else {
+        const b = blocker(s);
+        if (b) { line = b; cls = "block"; }
+        else if (st === "draft") { line = s.role === "promoter" ? "Signs by recording the promotion" : "Signs after it's recorded"; cls = ""; }
+        else { line = "Awaiting signature"; cls = "wait"; }
+      }
+      return `<div class="signer"><span class="role">${s.role === "promoter" ? "Promoting instructor" : "Second signature"}</span>
+        <span class="nm">${esc(s.name)}${s.title ? ` · <span style="font-weight:400">${esc(s.title)}</span>` : ""}</span>
+        <span class="mono">${esc(s.wallet)}</span><span class="st ${cls}">${esc(line)}</span></div>`;
+    }).join("");
+
+    const action = $("s-action"), reset = $("s-reset"), hint = $("s-hint");
+    if (st === "draft") {
+      const p = list.find((s) => s.role === "promoter");
+      action.hidden = false;
+      action.textContent = `Record and sign as ${p.name}`;
+      action.disabled = !!blocker(p);
+      reset.hidden = true;
+      hint.textContent = "Recording writes these details on-chain and signs them. They can't be edited afterwards, only revoked.";
+    } else if (st === "pending") {
+      const c = list.find((s) => !s.signedAt);
+      action.hidden = false;
+      action.textContent = `Sign as ${c.name}`;
+      action.disabled = !!blocker(c);
+      reset.hidden = false;
+      hint.textContent = `The certificate shows as pending until ${c.name} signs. Verifiers see it as incomplete.`;
+    } else {
+      action.hidden = true;
+      reset.hidden = false;
+      hint.textContent = "Every required signature is in. Anyone scanning the QR sees a complete record.";
+    }
+  }
+
+  $("s-action").addEventListener("click", () => {
+    const st = status();
+    if (st === "draft") {
+      const list = draftSigners();
+      if (blocker(list[0])) return;
+      signAs(list[0]);
+      record = { recordedAt: list[0].signedAt, signers: list };
+      toast(list.length > 1 ? `Recorded. Waiting for ${list[1].name} to sign.` : "Recorded and signed.");
+    } else if (st === "pending") {
+      const entry = record.signers.find((s) => !s.signedAt);
+      if (blocker(entry)) return;
+      signAs(entry);
+      toast(`Signed by ${entry.name}. Certificate complete.`);
+    }
+    render();
+  });
+  $("s-reset").addEventListener("click", () => { record = null; render(); toast("New draft started."); });
+
+  // ---------- Gym profile: logo ----------
+  function renderLogo() {
+    const { logo, logoHash, logoIsSample, name } = profile.academy;
+    const img = logo ? `<img src="${logo}" alt="${esc(name)} logo">` : `<span class="empty">No logo yet</span>`;
+    $("p-logo-light").innerHTML = img;
+    $("p-logo-dark").innerHTML = img;
+    $("logo-remove").hidden = !logo || logoIsSample;
+    $("p-logo-hash").textContent = logo
+      ? `${logoIsSample ? "Sample logo · " : ""}${kb(logo)} KB · hash ${logoHash || "unavailable"}`
+      : "";
+    const note = $("p-logo-note");
+    note.textContent = logoIsSample ? "This is a sample. Upload your gym's logo to replace it." : "";
+    if (logo && !logoIsSample) {
+      loadImage(logo).then((im) => {
+        const l = meanLuminance(im);
+        if (l != null && l > 0.8) note.textContent = "This logo is very light, so it may be hard to see on the certificate paper. A version with a dark outline will print better.";
+        else if (l != null && l < 0.2) note.textContent = "This logo is very dark, so it may disappear on dark backgrounds. It's fine on the certificate.";
+      }).catch(() => {});
+    }
+  }
+
+  const crop = { img: null, S: 320, minZ: 1, maxZ: 4, z: 1, x: 0, y: 0 };
+  function cropZoomFromSlider() {
+    const t = Number($("crop-zoom").value) / 100;
+    crop.z = crop.minZ * Math.pow(crop.maxZ / crop.minZ, t);
+  }
+  function drawCrop(ctx, size, checker) {
+    const k = size / crop.S;
+    ctx.clearRect(0, 0, size, size);
+    if (checker) {
+      const n = 16, cell = size / n;
+      for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+        ctx.fillStyle = (i + j) % 2 ? "#E3E7EF" : "#F7F8FB";
+        ctx.fillRect(i * cell, j * cell, cell, cell);
+      }
+    }
+    const w = crop.img.naturalWidth * crop.z * k, h = crop.img.naturalHeight * crop.z * k;
+    ctx.drawImage(crop.img, size / 2 - w / 2 + crop.x * k, size / 2 - h / 2 + crop.y * k, w, h);
+  }
+  function clampPan() {
+    const w = crop.img.naturalWidth * crop.z, h = crop.img.naturalHeight * crop.z;
+    const mx = Math.max(0, (w - crop.S) / 2) + crop.S / 4, my = Math.max(0, (h - crop.S) / 2) + crop.S / 4;
+    crop.x = Math.max(-mx, Math.min(mx, crop.x));
+    crop.y = Math.max(-my, Math.min(my, crop.y));
+  }
+  function redrawCrop() { clampPan(); drawCrop($("crop-canvas").getContext("2d"), crop.S, true); }
+
+  function logoError(msg) { const e = $("logo-err"); e.textContent = msg; e.hidden = !msg; }
+
+  $("logo-file").addEventListener("change", async (ev) => {
+    const file = ev.target.files[0];
+    ev.target.value = "";
+    if (!file) return;
+    logoError("");
+    if (!IMAGE_TYPES.includes(file.type)) return logoError("Use a PNG, JPEG or WebP image. SVG and GIF aren't supported yet.");
+    if (file.size > LOGO_LIMIT.bytes) return logoError(`That file is ${(file.size / 1048576).toFixed(1)} MB. Use an image under 5 MB.`);
+    let img;
+    try { img = await loadImage(await readFile(file)); } catch { return logoError("That image couldn't be opened. Try exporting it again as PNG."); }
+    if (img.naturalWidth < LOGO_LIMIT.minPx || img.naturalHeight < LOGO_LIMIT.minPx) {
+      return logoError(`That image is only ${img.naturalWidth} × ${img.naturalHeight} px. Use one at least 128 × 128 px so it prints sharply.`);
+    }
+    crop.img = img;
+    crop.minZ = Math.min(crop.S / img.naturalWidth, crop.S / img.naturalHeight);       // whole logo fits
+    crop.maxZ = Math.max(crop.S / img.naturalWidth, crop.S / img.naturalHeight) * 4;   // fill, then zoom in
+    crop.x = crop.y = 0;
+    $("crop-zoom").value = "0";
+    cropZoomFromSlider();
+    $("crop").hidden = false;
+    $("logo-actions").hidden = true;
+    redrawCrop();
+  });
+  $("crop-zoom").addEventListener("input", () => { cropZoomFromSlider(); redrawCrop(); });
+  (() => {
+    const cv = $("crop-canvas");
+    let drag = null;
+    cv.addEventListener("pointerdown", (e) => { if (!crop.img) return; cv.setPointerCapture(e.pointerId); drag = { x: e.clientX, y: e.clientY }; cv.style.cursor = "grabbing"; });
+    cv.addEventListener("pointermove", (e) => {
+      if (!drag) return;
+      const k = crop.S / cv.getBoundingClientRect().width;
+      crop.x += (e.clientX - drag.x) * k; crop.y += (e.clientY - drag.y) * k;
+      drag = { x: e.clientX, y: e.clientY };
+      redrawCrop();
+    });
+    const end = () => { drag = null; cv.style.cursor = "grab"; };
+    cv.addEventListener("pointerup", end); cv.addEventListener("pointercancel", end);
+  })();
+  function closeCrop() { $("crop").hidden = true; $("logo-actions").hidden = false; crop.img = null; }
+  $("crop-cancel").addEventListener("click", closeCrop);
+  $("crop-use").addEventListener("click", () => {
+    const out = document.createElement("canvas");
+    out.width = out.height = LOGO_LIMIT.outPx;
+    drawCrop(out.getContext("2d"), LOGO_LIMIT.outPx, false);
+    const url = out.toDataURL("image/png");
+    profile.academy.logo = url;
+    profile.academy.logoHash = hashImage(url);
+    profile.academy.logoIsSample = false;
+    closeCrop();
+    persist();
+    renderLogo(); render();
+    toast("Logo saved.");
+  });
+  $("logo-remove").addEventListener("click", () => {
+    profile.academy.logo = null; profile.academy.logoHash = null; profile.academy.logoIsSample = false;
+    persist(); renderLogo(); render();
+    toast("Logo removed.");
+  });
+  $("p-academy").addEventListener("input", (e) => {
+    profile.academy.name = e.target.value;
+    if (profile.academy.logoIsSample) {
+      profile.academy.logo = sampleLogo(profile.academy.name);
+      profile.academy.logoHash = hashImage(profile.academy.logo);
+      renderLogo();
+    }
+    saveSoon(); render();
+  });
+
+  // ---------- Gym profile: instructors + signature pad ----------
+  let openPadFor = null;
+
+  function renderInstructors() {
+    const onlyOne = profile.instructors.length <= 1;
+    $("instructors").innerHTML = profile.instructors.map((i) => {
+      const w = esc(i.wallet);
+      const sig = i.signature
+        ? `<img src="${i.signature}" alt="Signature of ${esc(i.name)}">`
+        : `<span class="empty">No signature yet. ${esc(i.name || "This instructor")} can't sign certificates until they add one.</span>`;
+      return `<article class="icard" data-wallet="${w}">
+        <div class="row2">
+          <div class="field"><label for="n-${w}">Name</label><input id="n-${w}" data-field="name" value="${esc(i.name)}"></div>
+          <div class="field"><label for="t-${w}">Title and rank</label><input id="t-${w}" data-field="title" value="${esc(i.title)}"></div>
+        </div>
+        <span class="mono">Wallet ${w} (sample)</span>
+        <div class="pad-slot"></div>
+        <div class="sig-area">
+          <div class="sigview">${sig}</div>
+          <p class="mono">${i.signature ? `${i.signatureIsSample ? "Sample signature · " : ""}${kb(i.signature)} KB · hash ${esc(i.signatureHash || "unavailable")}` : ""}</p>
+          <div class="btnrow">
+            <button type="button" class="btn ${i.signature && !i.signatureIsSample ? "" : "primary"}" data-action="draw">${i.signature && !i.signatureIsSample ? "Redo signature" : "Draw signature"}</button>
+            <label class="btn" style="position:relative">Upload image<input type="file" data-action="upload" accept="image/png,image/jpeg,image/webp"></label>
+            <span class="spacer"></span>
+            <button type="button" class="btn danger" data-action="remove" ${onlyOne ? "disabled title=\"A gym needs at least one instructor\"" : ""}>Remove</button>
+          </div>
+          <p class="err" data-role="err" role="alert" hidden></p>
+        </div>
+      </article>`;
+    }).join("");
+    $("add-instructor").disabled = profile.instructors.length >= MAX_INSTRUCTORS;
+    if (openPadFor) {
+      const card = document.querySelector(`.icard[data-wallet="${CSS.escape(openPadFor)}"]`);
+      if (card) openPad(card); else openPadFor = null;
+    }
+  }
+
+  function setSignature(wallet, url) {
+    const ins = byWallet(wallet);
+    if (!ins) return;
+    ins.signature = url;
+    ins.signatureHash = hashImage(url);
+    ins.signatureIsSample = false;
+    persist();
+    openPadFor = null;
+    renderInstructors(); render();
+    toast(`Signature saved for ${ins.name || "instructor"}.`);
+  }
+
+  function openPad(card) {
+    const wallet = card.dataset.wallet;
+    openPadFor = wallet;
+    card.querySelector(".sig-area").hidden = true;
+    const slot = card.querySelector(".pad-slot");
+    slot.innerHTML = `<div class="field"><span style="font-size:0.85rem;font-weight:500">Sign with your finger, Apple Pencil, mouse or trackpad</span>
+      <div class="pad"><canvas aria-label="Signature pad"></canvas><div class="baseline"></div><span class="x">✕</span></div></div>
+      <div class="btnrow">
+        <button type="button" class="btn" data-pad="undo" disabled>Undo stroke</button>
+        <button type="button" class="btn" data-pad="clear" disabled>Clear</button>
+        <span class="spacer"></span>
+        <button type="button" class="btn" data-pad="cancel">Cancel</button>
+        <button type="button" class="btn primary" data-pad="save" disabled>Save signature</button>
+      </div>`;
+    const cv = slot.querySelector("canvas");
+    const g = cv.getContext("2d");
+    const strokes = [];
+    let current = null, dpr = 1;
+
+    const widthFor = (p) => (cv.width / dpr / 150) * (0.55 + p * 0.9);
+    function segment(a, b) {
+      g.lineWidth = widthFor((a.p + b.p) / 2) * dpr;
+      g.beginPath(); g.moveTo(a.x * dpr, a.y * dpr); g.lineTo(b.x * dpr, b.y * dpr); g.stroke();
+    }
+    function redraw() {
+      g.clearRect(0, 0, cv.width, cv.height);
+      g.strokeStyle = INK; g.fillStyle = INK; g.lineCap = "round"; g.lineJoin = "round";
+      for (const s of strokes) {
+        if (s.length === 1) { g.beginPath(); g.arc(s[0].x * dpr, s[0].y * dpr, widthFor(s[0].p) * dpr / 2, 0, Math.PI * 2); g.fill(); }
+        for (let i = 1; i < s.length; i++) segment(s[i - 1], s[i]);
+      }
+      const empty = strokes.length === 0;
+      slot.querySelector('[data-pad="undo"]').disabled = empty;
+      slot.querySelector('[data-pad="clear"]').disabled = empty;
+      slot.querySelector('[data-pad="save"]').disabled = empty;
+    }
+    function size() {
+      const r = cv.getBoundingClientRect();
+      const old = cv.width / dpr || r.width;
+      dpr = window.devicePixelRatio || 1;
+      cv.width = Math.max(1, Math.round(r.width * dpr)); cv.height = Math.max(1, Math.round(r.height * dpr));
+      // Keep strokes proportional if the pad changes width (rotation, resize)
+      const k = r.width / old;
+      if (k && Math.abs(k - 1) > 0.001) strokes.forEach((s) => s.forEach((pt) => { pt.x *= k; pt.y *= k; }));
+      redraw();
+    }
+    const pt = (e) => {
+      const r = cv.getBoundingClientRect();
+      const p = e.pointerType === "mouse" ? 0.5 : (e.pressure > 0 ? e.pressure : 0.5);
+      return { x: e.clientX - r.left, y: e.clientY - r.top, p };
+    };
+    cv.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      cv.setPointerCapture(e.pointerId);
+      current = [pt(e)]; strokes.push(current); redraw();
+    });
+    cv.addEventListener("pointermove", (e) => {
+      if (!current) return;
+      const evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+      g.strokeStyle = INK; g.lineCap = "round";
+      for (const ce of (evs.length ? evs : [e])) { const q = pt(ce); segment(current[current.length - 1], q); current.push(q); }
+    });
+    const end = () => { if (current) { current = null; redraw(); } };
+    cv.addEventListener("pointerup", end); cv.addEventListener("pointercancel", end);
+    new ResizeObserver(size).observe(cv);
+
+    slot.querySelector('[data-pad="undo"]').onclick = () => { strokes.pop(); redraw(); };
+    slot.querySelector('[data-pad="clear"]').onclick = () => { strokes.length = 0; redraw(); };
+    slot.querySelector('[data-pad="cancel"]').onclick = () => { openPadFor = null; renderInstructors(); };
+    slot.querySelector('[data-pad="save"]').onclick = () => {
+      const url = trimToPng(cv, SIG_LIMIT.outW, SIG_LIMIT.outH);
+      if (url) setSignature(wallet, url);
+    };
+  }
+
+  async function uploadSignature(card, file) {
+    const err = card.querySelector('[data-role="err"]');
+    const fail = (m) => { err.textContent = m; err.hidden = false; };
+    err.hidden = true;
+    if (!IMAGE_TYPES.includes(file.type)) return fail("Use a PNG, JPEG or WebP image.");
+    if (file.size > SIG_LIMIT.bytes) return fail(`That file is ${(file.size / 1048576).toFixed(1)} MB. Use an image under 2 MB.`);
+    let img;
+    try { img = await loadImage(await readFile(file)); } catch { return fail("That image couldn't be opened."); }
+    const scale = Math.min(1, 1600 / Math.max(img.naturalWidth, img.naturalHeight));
+    const c = document.createElement("canvas");
+    c.width = Math.round(img.naturalWidth * scale); c.height = Math.round(img.naturalHeight * scale);
+    const g = c.getContext("2d");
+    g.drawImage(img, 0, 0, c.width, c.height);
+    // Remove a white or light paper background so the signature sits on the certificate
+    const d = g.getImageData(0, 0, c.width, c.height);
+    for (let i = 0; i < d.data.length; i += 4) {
+      const l = (0.2126 * d.data[i] + 0.7152 * d.data[i + 1] + 0.0722 * d.data[i + 2]) / 255;
+      if (l > 0.82) d.data[i + 3] = 0;
+    }
+    g.putImageData(d, 0, 0);
+    const url = trimToPng(c, SIG_LIMIT.outW, SIG_LIMIT.outH);
+    if (!url) return fail("Couldn't find a signature in that image. Use dark ink on a light background.");
+    setSignature(card.dataset.wallet, url);
+  }
+
+  $("instructors").addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-action]");
+    if (!btn || btn.tagName === "INPUT") return;
+    const card = btn.closest(".icard");
+    if (btn.dataset.action === "draw") {
+      if (openPadFor && openPadFor !== card.dataset.wallet) { openPadFor = null; renderInstructors(); }
+      const fresh = document.querySelector(`.icard[data-wallet="${CSS.escape(card.dataset.wallet)}"]`);
+      openPad(fresh);
+    } else if (btn.dataset.action === "remove") {
+      if (profile.instructors.length <= 1) return;
+      const ins = byWallet(card.dataset.wallet);
+      profile.instructors = profile.instructors.filter((i) => i.wallet !== card.dataset.wallet);
+      if (openPadFor === card.dataset.wallet) openPadFor = null;
+      persist();
+      renderInstructors(); fillSignerSelects(); render();
+      toast(`${ins.name || "Instructor"} removed. Certificates they already signed keep their signature.`);
+    }
+  });
+  $("instructors").addEventListener("change", (e) => {
+    if (e.target.dataset.action === "upload" && e.target.files[0]) {
+      const file = e.target.files[0]; e.target.value = "";
+      uploadSignature(e.target.closest(".icard"), file);
+    }
+  });
+  $("instructors").addEventListener("input", (e) => {
+    const field = e.target.dataset.field;
+    if (!field) return;
+    const ins = byWallet(e.target.closest(".icard").dataset.wallet);
+    ins[field] = e.target.value;
+    saveSoon();
+    fillSignerSelects(); render();
+  });
+  $("add-instructor").addEventListener("click", () => {
+    if (profile.instructors.length >= MAX_INSTRUCTORS) return;
+    let wallet;
+    try { wallet = ethers.Wallet.createRandom().address; } catch { wallet = "0x" + Array.from(crypto.getRandomValues(new Uint8Array(20)), (b) => b.toString(16).padStart(2, "0")).join(""); }
+    profile.instructors.push({ wallet, name: "New Instructor", title: "Black Belt", signature: null, signatureHash: null, signatureIsSample: false });
+    persist();
+    renderInstructors(); fillSignerSelects(); render();
+    const input = document.getElementById(`n-${wallet}`);
+    if (input) { input.focus(); input.select(); }
+  });
+
+  // ---------- Guilloche ----------
   function drawGuilloche() {
     const c = $("guilloche"), r = c.getBoundingClientRect();
     const dpr = window.devicePixelRatio || 1;
@@ -421,9 +1177,16 @@ nav.tabs .count { font-family: var(--font-mono); font-size: 0.75rem; margin-left
     }
   }
 
+  // ---------- Wiring ----------
+  // Recorded promotions are immutable: editing any detail starts a new draft.
+  function formChanged() {
+    if (record) { record = null; toast("Details changed, so this is a new draft."); }
+    render();
+  }
   $("form").addEventListener("submit", (e) => e.preventDefault());
-  $("belt").addEventListener("change", () => { fillDegrees(Number($("degree").value)); render(); });
-  ["student", "degree", "date", "instructor", "academy"].forEach((id) => $(id).addEventListener("input", render));
+  $("belt").addEventListener("change", () => { fillDegrees(Number($("degree").value)); formChanged(); });
+  $("promoter").addEventListener("change", () => { fillSignerSelects(); formChanged(); });
+  ["student", "degree", "date", "cosigner"].forEach((id) => $(id).addEventListener("input", formChanged));
   $("copy").addEventListener("click", async () => {
     const btn = $("copy"), text = $("r-fp").textContent;
     try { await navigator.clipboard.writeText(text); btn.textContent = "Copied"; }
@@ -432,22 +1195,46 @@ nav.tabs .count { font-family: var(--font-mono); font-size: 0.75rem; margin-left
   });
   new ResizeObserver(drawGuilloche).observe($("cert"));
 
+  const TABS = ["certificate", "profile", "questions"];
   function showTab(name) {
-    if (name !== "questions") name = "certificate";
+    if (!TABS.includes(name)) name = "certificate";
     document.querySelectorAll("nav.tabs a").forEach((a) => {
       if (a.dataset.tab === name) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
     });
-    $("page-certificate").hidden = name !== "certificate";
-    $("page-questions").hidden = name !== "questions";
+    TABS.forEach((t) => ($(`page-${t}`).hidden = t !== name));
   }
-  document.querySelectorAll("nav.tabs a").forEach((a) => a.addEventListener("click", (e) => {
-    e.preventDefault();
-    showTab(a.dataset.tab);
-    try { history.replaceState(null, "", "#" + a.dataset.tab); } catch {}
-  }));
+  function go(name) {
+    showTab(name);
+    try { history.replaceState(null, "", "#" + name); } catch {}
+    window.scrollTo(0, 0);
+  }
+  document.querySelectorAll("nav.tabs a").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); go(a.dataset.tab); }));
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest("[data-goto]");
+    if (a) { e.preventDefault(); go(a.dataset.goto); }
+  });
   showTab(location.hash.slice(1));
 
-  fillDegrees(2);
-  render();
+  async function init() {
+    try { await Promise.race([document.fonts.ready, new Promise((r) => setTimeout(r, 1500))]); } catch {}
+    fillSamples();
+    $("p-academy").value = profile.academy.name;
+    fillDegrees(2);
+    fillSignerSelects(profile.instructors[1] ? profile.instructors[1].wallet : "");
+    // Open on a realistic mid-flow example: recorded by the promoting instructor,
+    // waiting on the second signature.
+    const list = draftSigners();
+    if (list.length > 1 && !blocker(list[0])) {
+      signAs(list[0]);
+      list[0].signedAt -= 1000 * 60 * 42;
+      record = { recordedAt: list[0].signedAt, signers: list };
+    }
+    renderLogo();
+    renderInstructors();
+    render();
+  }
+  init();
 })();
 </script>
+</body>
+</html>
