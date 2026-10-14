@@ -4,6 +4,14 @@ Jiu-jitsu belt promotions recorded on a public blockchain, plus a printable cert
 
 **Live prototype:** https://sphericalwave.com/beltchain/
 
+## Contents
+
+- [How it works](#how-it-works)
+- [Layout](#layout)
+- [Commands](#commands)
+- [Open questions](#open-questions)
+- [Nova Scotia resources](#nova-scotia-resources)
+
 ## How it works
 
 1. **Academy registers** (`registerAcademy`) and the registry admin marks it verified (`setVerified`). Unverified academies can't issue belts.
@@ -38,3 +46,10 @@ PRIVATE_KEY=0x... npm run deploy:sepolia   # Base Sepolia testnet, needs faucet 
 - **Student privacy.** Names are public and permanent on-chain. Alternative: store only a hash of the name and keep the name on the paper certificate.
 - **Chain.** Base chosen for sub-cent fees and Coinbase wallet onboarding. Any EVM chain works unchanged.
 - **Backfill.** Existing belts (including instructors' own black belts for lineage) need a bulk-import path.
+
+## Nova Scotia resources
+
+There is no official Nova Scotia jiu-jitsu black-belt registry that we could find. These informal lists are the closest:
+
+- [All of the BJJ Clubs in Nova Scotia](https://joshpresley.substack.com/p/all-of-the-bjj-clubs-in-nova-scotia) — Josh Presley's directory (Feb 2025): 37 clubs with instructors and ranks, about 19 black belts. Ranks are as reported by the clubs; no lineage.
+- [Coastline BJJ Collective: Nova Scotia clubs](https://www.coastline-bjj-collective.com/clubs-atlantic-canada/nova-scotia) — map and list of Nova Scotia academies; no ranks.
